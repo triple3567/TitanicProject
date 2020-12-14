@@ -41,8 +41,8 @@ def execute():
     #drop rows with no 'Embarked' value
     dataset = dataset[dataset['Embarked'].notna()]
 
-    #set rows with no 'Age' value to Age='NaN'
-    dataset.replace('',np.NaN)
+    #drop rows with no 'Age' value 
+    dataset = dataset[dataset['Age'].notna()]
 
     #replace 'Embarked' with one hot vectors
     dataset['Embarked'] = dataset['Embarked'].map(

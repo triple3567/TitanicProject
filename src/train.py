@@ -1,36 +1,46 @@
 import load
-import tensorflow as tf
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.layers.experimental import preprocessing
 import pandas as pd
+from sklearn import datasets
+from sklearn import linear_model
 
 #   use logistic regression to train model
 #   gets dataset from load.py
 #   returns trained model
 
-def plot_loss(history):
-  plt.plot(history.history['loss'], label='loss')
-  plt.plot(history.history['val_loss'], label='val_loss')
-  plt.ylim([0, 10])
-  plt.xlabel('Epoch')
-  plt.ylabel('Error [MPG]')
-  plt.legend()
-  plt.grid(True)
-  plt.show()
+def normal_equations_method(train_features, train_labels):
+  A = np.array(train_features)
+  b = np.array(train_labels)
+  A_transpose = np.transpose(A)
 
+  A_At = np.matmul(A_transpose, A)
+  At_b = np.matmul(A_transpose, b)
 
-def execute(train_features, train_labels, test_features, test_labels):
+  L = np.tril(A_At)
+  U = np.triu(A_At)
 
-  print(train_features)
-  print(train_labels)
-  print(test_features)
-  print(test_labels)
+  z = np.linalg.solve(L, At_b)
+  x = np.linalg.solve(U, z)
 
-  
+  return x
+
+def logistic_regression(train_features, train_labels):
+  LRG = linear_model.LogisticRegression(
+  random_state = 0,solver = 'liblinear',multi_class = 'auto'
+  )
+  A = np.array(train_features)
+  b = np.array(train_labels)
+
+  LRG.fit(A,b)
+  return LRG
+
+def execute(train_features, train_labels):
+  x = normal_equations_method(train_features, train_labels)
+  LRG = logistic_regression(train_features,train_labels)
+
+  # Returns the x vector from normal equations, and logistic regression model
+
+  return x, LRG
 
 
 
