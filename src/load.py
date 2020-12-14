@@ -71,9 +71,5 @@ def execute():
 
     train_labels = train_features.pop('Survived')
     test_labels = test_features.pop('Survived')
-
-    #normalize features -- TODO
-    #normalizer = preprocessing.Normalization()
-    #normalizer.adapt(np.array(train_features))
-
+    
     return train_features, train_labels, test_features, test_labels
