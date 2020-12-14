@@ -1,4 +1,3 @@
-import load
 import numpy as np
 import pandas as pd
 from sklearn import datasets
@@ -42,7 +41,3 @@ def execute(train_features, train_labels):
 
   return x, LRG
 
-
-
-if __name__ == '__main__':
-  execute(load.execute())

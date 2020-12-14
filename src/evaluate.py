@@ -1,40 +1,68 @@
-from sklearn import datasets
-from sklearn import linear_model
 from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import plot_roc_curve
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn
+
+def plot_confusion_matrix_normal(data, labels):
+    """Plot confusion matrix using heatmap.
+ 
+    Args:
+        data (list of list): List of lists with confusion matrix data.
+        labels (list): Labels which will be plotted across x and y axis.
+        output_filename (str): Path to output file.
+ 
+    """
+    seaborn.set(color_codes=True)
+    plt.figure(1, figsize=(9, 6))
+ 
+    plt.title("Normal Equations Method Confusion Matrix")
+ 
+    seaborn.set(font_scale=1.4)
+    ax = seaborn.heatmap(data, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Scale'})
+ 
+    ax.set_xticklabels(labels)
+    ax.set_yticklabels(labels)
+ 
+    ax.set(ylabel="True Label", xlabel="Predicted Label")
+
+    plt.show()
 
 def eval_lrg(LRG, test_features, test_labels):
     A = np.array(test_features)
     b = np.array(test_labels)
 
-    print(LRG.score(A,b))
-
     solution = LRG.predict(A)
+    score = LRG.score(A, b)
 
-    true_positive = 0
-    true_negative = 0
-    false_positive = 0
-    false_negative = 0
+    # lrg header
+    print()
+    print("################################")
+    print("#   Solving Titanic Problem    #")
+    print("#  Using Logistic Regression   #")
+    print("################################")
 
-    for i in range(len(solution)):
-        if solution[i] == b[i]:
-            if solution[i] == 0:
-                true_negative += 1
-            else:
-                true_positive += 1
-        else:
-            if solution[i] == 0:
-                false_negative += 1
-            else:
-                false_positive += 1
+    # display info about model to console
+    print()
+    print("Accuracy of Logistic Regression Model on Test Set = ")
+    print(score)
 
-    print(true_positive)
-    print(true_negative)
-    print(false_positive)
-    print(false_negative)
+    # Coeficcient Values
+    coef_temp = np.vstack([test_features.columns, LRG.coef_])
+    coef = pd.DataFrame(coef_temp)
+    print()
+    print("Coefficient Values for Logistic Regression Model")
+    print(coef)
 
+    # plot confusion matrix
     plot_confusion_matrix(LRG, A, b)
+    plt.title("Logistic Regression Confusion Matrix")
+    plt.show()
+
+    # plot roc curve
+    plot_roc_curve(LRG, A, b)
+    plt.title("Logistic Regression ROC curve")
     plt.show()
 
 def eval_normal_equation(x, test_features, test_labels):
@@ -43,25 +71,63 @@ def eval_normal_equation(x, test_features, test_labels):
 
     solution = np.matmul(A,x)
 
-    threshold = 0.001    #set a thershold for the solution
+    threshold = 0.5    #set a thershold for the solution
     for i in range(len(solution)):
         if abs(solution[i]) > threshold:
             solution[i] = 1
         else:
             solution[i] = 0
-    
-    print(solution)
-    print(b)
+
     count = 0
     success = 0
     rate = 0
+    true_pos = 0
+    true_neg = 0
+    false_pos = 0
+    false_neg = 0
     for i in range(len(solution)):
         count += 1
         if solution[i] == b[i]:
             success += 1
+            if solution[i] == 1:
+                true_pos += 1
+            else:
+                true_neg += 1
+        else:
+            if solution[i] == 1:
+                false_pos += 1
+            else:
+                false_neg += 1
+
+    rate = float(success) / float(count)
+
+    x_temp = np.vstack([test_features.columns, x])
+    x_label = pd.DataFrame(x_temp)
+
+    print()
+    print("################################")
+    print("#   Solving Titanic Problem    #")
+    print("# Using Normal Equation Method #")
+    print("################################")
+
+    print()
+    print("Accuracy of Normal Equations Method on Test Set = ")
+    print(rate)
+
+    print()
+    print("X solution vector for Normal Equations Method")
+    print(x_label)
+
+    # plot confustion matrix
+    confustion_matrix_data = [[true_neg, false_pos],
+                              [false_neg, true_pos]]
+    labels = ['0', '1']    
+
+    plot_confusion_matrix_normal(confustion_matrix_data, labels)
 
 def execute(x, LRG, test_features, test_labels):
 
+    pd.set_option('display.max_columns', None)
     # evaluate LRG and plot
     eval_lrg(LRG, test_features, test_labels)
     

@@ -77,6 +77,3 @@ def execute():
     #normalizer.adapt(np.array(train_features))
 
     return train_features, train_labels, test_features, test_labels
-
-if __name__ == '__main__':
-    execute()
