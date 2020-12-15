@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn
 
+WRITE_PATH = "../data/predicted.csv"
+
 def plot_confusion_matrix_normal(data, labels):
     """Plot confusion matrix using heatmap.
  
@@ -65,13 +67,24 @@ def eval_lrg(LRG, test_features, test_labels):
     plt.title("Logistic Regression ROC curve")
     plt.show()
 
+    # create solution csv
+    predictions_csv = test_features.copy()
+    predictions_csv.insert(12, "Predicted Label", np.transpose(solution))
+    predictions_csv.insert(13, "Actual Label", test_labels)
+    predictions_csv.to_csv(WRITE_PATH)
+
 def eval_normal_equation(x, test_features, test_labels):
     A = np.array(test_features)
     b = np.array(test_labels)
 
     solution = np.matmul(A,x)
 
-    threshold = 0.5    #set a thershold for the solution
+    # set a thershold for the solution
+    # if a datapoint is greater that 0.5, its predicted they will survive
+    # if the datapoint is less than 0.5, its predicted they will not survive
+    threshold = 0.5    
+    
+
     for i in range(len(solution)):
         if abs(solution[i]) > threshold:
             solution[i] = 1
